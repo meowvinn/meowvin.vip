@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0e0c10;
+    --surface: #18151b;
+    --line: #2a2530;
+    --pink: #ff6fb0;
+    --pink-dim: #d35e94;
+    --text: #f2eef2;
+    --text-soft: #968d99;
+    --font: 'Sora', sans-serif;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+
+  body{
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 40px 20px;
+  }
+
+  .page{
+    width: 100%;
+    max-width: 920px;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+
+  .profile{
+    position: sticky;
+    top: 40px;
+  }
+
+  .avatar{
+    width: 88px; height: 88px;
+    border-radius: 18px;
+    background: var(--surface);
+    border: 2px solid var(--pink);
+    box-shadow: 0 4px 14px rgba(255, 111, 176, 0.25);
+    display:flex; align-items:center; justify-content:center;
+    font-weight: 600;
+    font-size: 28px;
+    color: var(--pink);
+    margin-bottom: 20px;
+    object-fit: cover;
+  }
+
+  .name{
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .handle{
+    font-size: 14px;
+    color: var(--pink);
+    font-weight: 500;
+    margin-top: 4px;
+  }
+
+  .bio{
+    margin-top: 16px;
+    font-size: 14.5px;
+    color: var(--text-soft);
+    line-height: 1.75;
+    max-width: 280px;
+  }
+
+  .socials{
+    display:flex;
+    gap: 10px;
+    margin-top: 24px;
+  }
+  .social-item{
+    position: relative;
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    color: var(--text-soft);
+    text-decoration:none;
+    font-size: 16px;
+    transition: border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  }
+  .copy-tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    background: var(--pink);
+    color: #0e0c10;
+    padding: 5px 9px;
+    border-radius: 6px;
+    font-size: 11.5px;
+    font-weight: 700;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(255, 111, 176, 0.3);
+  }
+  .copy-tooltip.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .copy-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--pink) transparent transparent transparent;
+  }
+  .social-item:hover{
+    border-color: var(--pink);
+    color: var(--pink);
+    transform: translateY(-2px);
+  }
+  .social-item img{
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    transition: transform 0.15s ease;
+  }
+
+  .main{
+    display:flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .section-title{
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    margin-bottom: 14px;
+  }
+
+  .links{
+    display:flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .link-item{
+    display:flex;
+    align-items:center;
+    gap: 16px;
+    padding: 16px 18px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    text-decoration:none;
+    color: var(--text);
+    transition: border-color 0.15s ease, transform 0.12s ease, background 0.15s ease;
+  }
+  .link-item:hover{
+    border-color: var(--pink);
+    background: #1d1820;
+    transform: translateX(3px);
+  }
+  .link-item .icon{
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: rgba(255, 111, 176, 0.1);
+    border: 1px solid rgba(255, 111, 176, 0.25);
+    display:flex; align-items:center; justify-content:center;
+    font-size: 16px;
+    color: var(--pink);
+    flex-shrink:0;
+  }
+  .link-item .icon img{
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+  }
+  .link-icon-mask {
+    width: 20px;
+    height: 20px;
+    background-color: currentColor;
+    -webkit-mask-size: contain; mask-size: contain;
+    -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+    -webkit-mask-position: center; mask-position: center;
+  }
+  .icon-jellyfin {
+    -webkit-mask-image: url('https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/jellyfin.svg');
+    mask-image: url('https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/jellyfin.svg');
+  }
+  .link-item .meta{ flex:1; }
+  .link-item .meta .title{
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .link-item .meta .sub{
+    font-size: 12.5px;
+    color: var(--text-soft);
+    margin-top: 2px;
+  }
+  .link-item .arrow{
+    font-size: 16px;
+    color: var(--text-soft);
+    transition: color 0.15s ease, transform 0.15s ease;
+  }
+  .link-item:hover .arrow{
+    color: var(--pink);
+    transform: translateX(2px);
+  }
+
+  .audio-player{
+    margin-top: 32px;
+    padding: 18px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    max-width: 280px;
+  }
+  .audio-main-content{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .audio-info{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .audio-title{
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .audio-artist{
+    font-size: 12px;
+    color: var(--text-soft);
+  }
+  .audio-controls{
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .play-btn{
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 111, 176, 0.1);
+    border: 1px solid rgba(255, 111, 176, 0.25);
+    color: var(--pink);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  }
+  .play-btn:hover{
+    background: var(--pink);
+    color: #0e0c10;
+    transform: scale(1.05);
+  }
+  .play-btn svg {
+    margin-left: 2px;
+  }
+  .play-btn svg#pauseIcon {
+    margin-left: 0;
+  }
+  .audio-progress-wrapper{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .audio-timing-row{
+    display: flex;
+    justify-content: space-between;
+    font-size: 10.5px;
+    font-weight: 500;
+    color: var(--text-soft);
+    margin-bottom: 6px;
+  }
+  .progress-container{
+    height: 6px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .progress-bar{
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 0%;
+    background: var(--pink);
+    border-radius: 3px;
+    pointer-events: none;
+    transition: width 0.1s linear;
+  }
+  .audio-volume-vertical{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding-left: 12px;
+    border-left: 1px solid rgba(255, 111, 176, 0.15);
+  }
+  .volume-slider-wrapper{
+    height: 60px;
+    width: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .volume-slider{
+    width: 60px;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+    transform: rotate(-90deg);
+  }
+  .volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--pink);
+    cursor: pointer;
+  }
+  .volume-slider::-moz-range-thumb {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--pink);
+    cursor: pointer;
+    border: none;
+  }
+
+  .about{
+    font-size: 14.5px;
+    color: var(--text-soft);
+    line-height: 1.8;
+    max-width: 540px;
+  }
+  .about a{
+    color: var(--pink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--pink-dim);
+  }
+
+  .stack{
+    display:flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .stack-item{
+    font-size: 13px;
+    color: var(--text-soft);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 6px 12px;
+  }
+
+  footer{
+    margin-top: 8px;
+    font-size: 12.5px;
+    color: var(--text-soft);
+    border-top: 1px solid var(--line);
+    padding-top: 18px;
+  }
+
+  .enter-screen{
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--bg);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+    cursor: pointer;
+  }
+  .enter-screen.hidden{
+    opacity: 0;
+    visibility: hidden;
+  }
+  .enter-text{
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-soft);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    animation: blink 2s infinite ease-in-out;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  @media (max-width: 720px){
+    .page{
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+    .profile{
+      position: static;
+    }
+    .bio{ max-width: none; }
+  }
+</style>
+</head>
+<body>
+
+  <div id="enterScreen" class="enter-screen">
+    <div class="enter-text">[ click to enter ]</div>
+  </div>
+
+  <div class="page">
+
+    <div class="profile">
+      <img class="avatar" src="media/image/pfp/monkika.jpg" alt="Profile Picture">
+      <div class="name">mel</div>
+      <div class="handle">@meowvinn</div>
+      <p class="bio">
+        chungus blud makes a placeholder site.
+      </p>
+
+      <div class="socials">
+        <a class="social-item" href="https://github.com/meowvinn" target="_blank" aria-label="GitHub" title="GitHub"><img src="media/image/icons/github.png" alt="GitHub"></a>
+        <a class="social-item" href="#" onclick="copyDiscord(event)" aria-label="Discord" title="@furryswag">
+          <img src="media/image/icons/discord.png" alt="Discord" style="transform: scale(1.35);">
+          <span class="copy-tooltip" id="discord-tooltip">Copied!</span>
+        </a>
+        <a class="social-item" href="https://steamcommunity.com/profiles/76561198143230388" target="_blank" aria-label="Steam" title="Steam"><img src="media/image/icons/steam.jpg" alt="Steam"></a>
+      </div>
+
+      <div class="audio-player">
+        <div class="audio-main-content">
+          <div class="audio-info">
+            <div class="audio-title">so loud</div>
+            <div class="audio-artist">Prettyboy2008</div>
+          </div>
+          <div class="audio-controls">
+            <button class="play-btn" id="playBtn" aria-label="Play">
+              <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              <svg id="pauseIcon" style="display:none;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+            </button>
+            <div class="audio-progress-wrapper">
+              <div class="audio-timing-row">
+                <span id="currentTimeDisplay">0:00</span>
+                <span id="durationDisplay">0:00</span>
+              </div>
+              <div class="progress-container" id="progressContainer">
+                <div class="progress-bar" id="progressBar"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="audio-volume-vertical">
+          <div class="volume-slider-wrapper">
+            <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5" class="volume-slider">
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-soft)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+        </div>
+        <audio id="myAudio" src="media/audio/so loud - Prettyboy2008.mp3"></audio>
+      </div>
+    </div>
+
+    <div class="main">
+
+      <div>
+        <div class="section-title">Links</div>
+        <div class="links">
+          <a class="link-item" href="https://jellyfin.meowvin.vip" target="_blank">
+            <div class="icon"><div class="link-icon-mask icon-jellyfin"></div></div>
+            <div class="meta">
+              <div class="title">Jellyfin</div>
+              <div class="sub">jellyfin.meowvin.vip</div>
+            </div>
+            <div class="arrow">→</div>
+          </a>
+          <a class="link-item" href="https://seer.meowvin.vip" target="_blank">
+            <div class="icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <div class="meta">
+              <div class="title">Jellyseerr</div>
+              <div class="sub">seer.meowvin.vip</div>
+            </div>
+            <div class="arrow">→</div>
+          </a>
+          <a class="link-item" href="https://tf.meowvin.vip" target="_blank">
+            <div class="icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>
+            </div>
+            <div class="meta">
+              <div class="title">Server Panel</div>
+              <div class="sub">tf.meowvin.vip</div>
+            </div>
+            <div class="arrow">→</div>
+          </a>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title">About</div>
+        <p class="about">
+          Always exploring, always creating. My free time is spent doing different things every week. Whether it's making music, editing videos, or playing competitive games.
+        </p>
+      </div>
+
+      <div>
+        <div class="section-title">Currently</div>
+        <div class="stack">
+          <span class="stack-item">graduating</span>
+          <span class="stack-item">exploring hobbies</span>
+          <span class="stack-item">creating</span>
+        </div>
+      </div>
+
+      <footer>
+        © 2026 gptmaxxer
+      </footer>
+
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const audio = document.getElementById('myAudio');
+      const playBtn = document.getElementById('playBtn');
+      const playIcon = document.getElementById('playIcon');
+      const pauseIcon = document.getElementById('pauseIcon');
+      const progressContainer = document.getElementById('progressContainer');
+      const progressBar = document.getElementById('progressBar');
+      const currentTimeDisplay = document.getElementById('currentTimeDisplay');
+      const durationDisplay = document.getElementById('durationDisplay');
+      const volumeSlider = document.getElementById('volumeSlider');
+
+      const formatTime = (time) => {
+        if(isNaN(time)) return "0:00";
+        const mins = Math.floor(time / 60);
+        const secs = Math.floor(time % 60);
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+      };
+
+      audio.addEventListener('loadedmetadata', () => {
+        durationDisplay.textContent = formatTime(audio.duration);
+      });
+
+      const updateVolumeSlider = () => {
+        const val = volumeSlider.value * 100;
+        volumeSlider.style.background = `linear-gradient(to right, var(--pink) ${val}%, rgba(255,255,255,0.06) ${val}%)`;
+      };
+      volumeSlider.addEventListener('input', (e) => {
+        audio.volume = e.target.value;
+        updateVolumeSlider();
+      });
+      audio.volume = volumeSlider.value;
+      updateVolumeSlider();
+
+      const enterScreen = document.getElementById('enterScreen');
+      enterScreen.addEventListener('click', () => {
+        enterScreen.classList.add('hidden');
+        if (audio.paused) {
+          audio.play().then(() => {
+            playIcon.style.display = 'none';
+            pauseIcon.style.display = 'block';
+          }).catch(() => {});
+        }
+      });
+
+      playBtn.addEventListener('click', () => {
+        if(audio.paused) {
+          audio.play();
+          playIcon.style.display = 'none';
+          pauseIcon.style.display = 'block';
+        } else {
+          audio.pause();
+          playIcon.style.display = 'block';
+          pauseIcon.style.display = 'none';
+        }
+      });
+
+      audio.addEventListener('timeupdate', () => {
+        if (!audio.duration) return;
+        const percent = (audio.currentTime / audio.duration) * 100;
+        progressBar.style.width = percent + '%';
+        currentTimeDisplay.textContent = formatTime(audio.currentTime);
+      });
+
+      progressContainer.addEventListener('click', (e) => {
+        const width = progressContainer.clientWidth;
+        const clickX = e.offsetX;
+        const duration = audio.duration;
+        if (duration) {
+          audio.currentTime = (clickX / width) * duration;
+        }
+      });
+
+      audio.addEventListener('ended', () => {
+        playIcon.style.display = 'block';
+        pauseIcon.style.display = 'none';
+        progressBar.style.width = '0%';
+      });
+    });
+
+    function copyDiscord(e) {
+      e.preventDefault();
+      navigator.clipboard.writeText('@furryswag');
+      const tooltip = document.getElementById('discord-tooltip');
+      tooltip.classList.add('show');
+      setTimeout(() => {
+        tooltip.classList.remove('show');
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
