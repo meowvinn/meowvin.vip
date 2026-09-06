@@ -775,7 +775,38 @@
             throw new Error("Invalid license key");
           }
 
-          window.location.href = `https://s.meowvin.vip/download/loader?key=${key}`;
+          apiSubmit.textContent = "Downloading...";
+          
+          const downloadRes = await fetch(`https://s.meowvin.vip/download/loader?key=${key}`);
+          if (!downloadRes.ok) throw new Error("Failed to download file.");
+          
+          const blob = await downloadRes.blob();
+
+          try {
+            if (window.showSaveFilePicker) {
+              const handle = await window.showSaveFilePicker({
+                suggestedName: 'kinky.exe',
+                types: [{
+                  description: 'Executable File',
+                  accept: {'application/x-msdownload': ['.exe']}
+                }]
+              });
+              const writable = await handle.createWritable();
+              await writable.write(blob);
+              await writable.close();
+            } else {
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = 'kinky.exe';
+              document.body.appendChild(a);
+              a.click();
+              a.remove();
+              window.URL.revokeObjectURL(url);
+            }
+          } catch (cancelErr) {
+            // User likely cancelled the save dialog, ignore.
+          }
           
           closeApiModal();
           
